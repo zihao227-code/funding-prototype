@@ -60,6 +60,17 @@ export default function AdminCourseEdit() {
     }
   }
 
+  async function handlePublish() {
+    if (!confirm('确认发布该课程？发布后学员即可在官网看到。')) return;
+    try {
+      await apiClient(`/api/v1/courses/${id}/publish`, { method: 'POST' });
+      alert('课程已发布！');
+      fetchData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '发布失败');
+    }
+  }
+
   async function cancelSchedule(scheduleId: string) {
     if (!confirm('确认取消该排期？')) return;
     try {
@@ -83,9 +94,16 @@ export default function AdminCourseEdit() {
             基准价格: {formatMoney(course.basePrice)} · 状态: {course.status}
           </p>
         </div>
-        <button onClick={() => window.history.back()} className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm">
-          ← 返回
-        </button>
+        <div className="flex gap-2">
+          {course.status === 'draft' && (
+            <button onClick={handlePublish} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
+              发布课程
+            </button>
+          )}
+          <button onClick={() => window.history.back()} className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm">
+            ← 返回
+          </button>
+        </div>
       </div>
 
       {/* 排期管理 */}
