@@ -32,4 +32,47 @@
 
 **推荐：B** — middleware 对公开资源路径只放过 GET，其余 Method 照常拦截
 
+**状态：** ✅ 已修复 — 拆分 `auth-edge.ts`（Edge兼容）+ middleware区分GET/POST
+
+---
+
+## 🟡 ISSUE-002：errorResponse 不兼容普通对象
+
+**发现时间：** 2026-07-01（Auth模块联调时）
+
+**现象：**
+- Auth route 中 Zod 校验失败时向 `errorResponse()` 传入普通对象 `{ code, message, statusCode, details }`
+- `errorResponse` 只处理 `AppError` 实例，普通对象被当作未预期错误返回500
+
+**根因分析：**
+`errorResponse` 设计时假设所有调用方都会先创建 AppError 实例，但 Zod 校验失败场景更适合直接传普通对象。
+
+**修复：** `errorResponse` 增加对普通 Error 实例和类 AppError 对象（`{ code, message, statusCode }`）的处理
+
+**状态：** ✅ 已修复
+
+---
+
+## 🟢 ISSUE-003：SQLite 不支持 Prisma 枚举
+
+**发现时间：** 2026-07-01（Prisma迁移时）
+
+**根因：** 架构Agent按 PostgreSQL 习惯生成24个 enum，但 SQLite connector 不支持
+
+**修复：** 全部改为 String 类型，注释标注合法值
+
+**状态：** ✅ 已修复
+
+---
+
+## 🟢 ISSUE-004：Edge Runtime 不能加载 bcryptjs
+
+**发现时间：** 2026-07-01（Middleware运行时）
+
+**根因：** middleware 运行在 Edge Runtime，但 `auth.ts` 导入了 bcryptjs（Node.js crypto），导致 middleware 模块加载失败
+
+**修复：** 拆出 `auth-edge.ts`（仅 jose），middleware 只引用 Edge 兼容模块
+
+**状态：** ✅ 已修复
+
 ---
