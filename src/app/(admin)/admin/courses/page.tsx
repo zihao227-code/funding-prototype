@@ -26,7 +26,13 @@ export default function AdminCourseList() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchCourses(); }, []);
+  useEffect(() => {
+    fetchCourses();
+    // 每次页面获得焦点时自动刷新
+    const onFocus = () => fetchCourses();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
 
   const handlePublish = async (id: string) => {
     await apiClient(`/api/v1/courses/${id}/publish`, { method: 'POST' });

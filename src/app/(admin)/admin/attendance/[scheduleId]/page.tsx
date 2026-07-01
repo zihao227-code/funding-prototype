@@ -26,18 +26,28 @@ export default function AttendanceRosterPage() {
   useEffect(() => { fetchRoster(); }, [scheduleId]);
 
   async function markStatus(userId: string, status: string) {
-    await apiClient('/api/v1/attendance', {
-      method: 'POST',
-      body: JSON.stringify({ scheduleId, userId, status }),
-    });
-    fetchRoster();
+    try {
+      await apiClient('/api/v1/attendance', {
+        method: 'POST',
+        body: JSON.stringify({ scheduleId, userId, status }),
+      });
+      alert('考勤状态更新成功');
+      fetchRoster();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '更新考勤失败');
+    }
   }
 
   if (loading) return <p className="text-gray-500">加载中...</p>;
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">考勤花名册</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">考勤花名册</h2>
+        <a href="#" onClick={(e) => { e.preventDefault(); window.history.back(); }} className="text-sm text-blue-600 hover:underline">
+          &larr; 返回排期列表
+        </a>
+      </div>
       <div className="bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">

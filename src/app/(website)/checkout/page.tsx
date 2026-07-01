@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { apiClient, formatMoney } from '@/lib/api-client';
 
 interface CartItem { scheduleId: string; title: string; price: number; }
@@ -39,8 +40,11 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold">确认订单</h1>
+          <Link href="/courses" className="text-sm text-blue-600 hover:underline">
+            &larr; 返回选课
+          </Link>
         </div>
       </header>
       <main className="max-w-4xl mx-auto px-4 py-8">

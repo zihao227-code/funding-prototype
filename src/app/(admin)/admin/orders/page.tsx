@@ -8,12 +8,26 @@ export default function AdminOrderList() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchOrders = () => {
+    setLoading(true);
     apiClient<{ data: any[] }>('/api/v1/orders?pageSize=50')
       .then((res) => setOrders(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetchOrders(); }, []);
+
+  async function handleCancel(orderId: string) {
+    if (!confirm('确认取消该订单？')) return;
+    try {
+      await apiClient(`/api/v1/orders/${orderId}/cancel`, { method: 'POST' });
+      alert('订单已取消');
+      fetchOrders();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '取消订单失败');
+    }
+  }
 
   if (loading) return <p className="text-gray-500">加载中...</p>;
 
@@ -30,6 +44,7 @@ export default function AdminOrderList() {
               <th className="text-left px-4 py-3 text-sm text-gray-500">金额</th>
               <th className="text-left px-4 py-3 text-sm text-gray-500">状态</th>
               <th className="text-left px-4 py-3 text-sm text-gray-500">时间</th>
+              <th className="text-right px-4 py-3 text-sm text-gray-500">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -49,6 +64,11 @@ export default function AdminOrderList() {
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-500">
                   {new Date(o.createdAt as string).toLocaleDateString('zh-CN')}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  {o.status === 'pending' && (
+                    <button onClick={() => handleCancel(o.id as string)} className="text-red-500 hover:underline text-sm">取消</button>
+                  )}
                 </td>
               </tr>
             ))}

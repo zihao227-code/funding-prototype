@@ -46,19 +46,29 @@ export default function AdminCourseEdit() {
       alert('请填写班次名称和时间');
       return;
     }
-    await apiClient(`/api/v1/courses/${id}/schedules`, {
-      method: 'POST',
-      body: JSON.stringify(newSchedule),
-    });
-    setShowAddSchedule(false);
-    setNewSchedule({ title: '', startTime: '', endTime: '', capacity: 20, price: null });
-    fetchData();
+    try {
+      await apiClient(`/api/v1/courses/${id}/schedules`, {
+        method: 'POST',
+        body: JSON.stringify(newSchedule),
+      });
+      alert('排期添加成功！');
+      setShowAddSchedule(false);
+      setNewSchedule({ title: '', startTime: '', endTime: '', capacity: 20, price: null });
+      fetchData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '添加排期失败');
+    }
   }
 
   async function cancelSchedule(scheduleId: string) {
     if (!confirm('确认取消该排期？')) return;
-    await apiClient(`/api/v1/schedules/${scheduleId}/cancel`, { method: 'POST', body: JSON.stringify({ reason: '手动取消' }) });
-    fetchData();
+    try {
+      await apiClient(`/api/v1/schedules/${scheduleId}/cancel`, { method: 'POST', body: JSON.stringify({ reason: '手动取消' }) });
+      alert('排期已取消');
+      fetchData();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '取消排期失败');
+    }
   }
 
   if (loading) return <p className="text-gray-500">加载中...</p>;
