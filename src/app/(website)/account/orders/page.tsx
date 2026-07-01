@@ -8,14 +8,26 @@ export default function MyOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
+  const fetchOrders = () => {
+    setLoading(true);
     apiClient<{ data: any[] }>('/api/v1/orders')
       .then((res) => setOrders(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetchOrders(); }, []);
+
+  async function handleCancel(orderId: string) {
+    if (!confirm('确认取消该订单？')) return;
+    try {
+      await apiClient(`/api/v1/orders/${orderId}/cancel`, { method: 'POST' });
+      alert('订单已取消');
+      fetchOrders();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '取消订单失败');
+    }
+  }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">加载中...</div>;
 
@@ -44,6 +56,14 @@ export default function MyOrdersPage() {
                 }`}>
                   {STATUS_LABELS[o.status as string] || (o.status as string)}
                 </span>
+                {o.status === 'pending' && (
+                  <button
+                    onClick={() => handleCancel(o.id as string)}
+                    className="block mt-2 text-xs text-red-500 hover:underline ml-auto"
+                  >
+                    取消
+                  </button>
+                )}
               </div>
             </div>
           ))}

@@ -101,6 +101,14 @@ export default function MockPaymentPage() {
         >
           {paying ? '支付处理中...' : '模拟支付成功'}
         </button>
+
+        <button
+          onClick={handleCancel}
+          disabled={cancelling}
+          className="w-full mt-3 py-2 border border-red-300 text-red-500 rounded-xl text-sm hover:bg-red-50 disabled:opacity-50"
+        >
+          {cancelling ? '取消中...' : '取消订单'}
+        </button>
       </div>
     </div>
   );
