@@ -83,6 +83,8 @@ export async function createSchedule(courseId: string, input: CreateScheduleInpu
   return prisma.schedule.create({
     data: {
       ...input,
+      startTime: new Date(input.startTime),
+      endTime: new Date(input.endTime),
       courseId,
       status: 'open',
     },

@@ -13,8 +13,8 @@ export const updateCourseSchema = createCourseSchema.partial();
 
 export const createScheduleSchema = z.object({
   title: z.string().min(1, '班次名称不能为空').max(100),
-  startTime: z.string().datetime(),
-  endTime: z.string().datetime(),
+  startTime: z.string().min(1, '开始时间不能为空'),
+  endTime: z.string().min(1, '结束时间不能为空'),
   capacity: z.number().int().min(1).max(999).default(20),
   registrationDeadline: z.string().datetime().optional(),
   price: z.number().int().min(0).optional().nullable(),
