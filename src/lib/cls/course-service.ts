@@ -107,7 +107,11 @@ export async function deleteCourse(id: string, tenantId: string) {
   if (course.status !== 'draft') {
     throw new Error(`无法删除状态为 "${course.status}" 的课程，只能删除草稿`);
   }
-  return prisma.course.delete({ where: { id, tenantId } });
+  // 先删关联排期，再删课程
+  return prisma.$transaction(async (tx) => {
+    await tx.schedule.deleteMany({ where: { courseId: id } });
+    return tx.course.delete({ where: { id, tenantId } });
+  });
 }
 
 /**
