@@ -68,7 +68,7 @@ async function main() {
     await prisma.classroom.upsert({
       where: { id: c.id },
       update: {},
-      create: { id: c.id, tenantId: tenant.id, ...c },
+      create: { tenantId: tenant.id, ...c },
     });
   }
   console.log(`  ✅ Classrooms: ${classrooms.length} 个`);

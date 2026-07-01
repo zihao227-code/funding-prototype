@@ -1,28 +1,40 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken } from '@/lib/auth-edge';
 
 /**
  * JWT 认证中间件
  *
- * 白名单路径跳过认证，其余路径验证 JWT
+ * 策略：公开读取（GET courses/schedules），写入操作需认证
  */
-const PUBLIC_PATHS = [
+const PUBLIC_PREFIXES = [
   '/api/v1/auth/login',
   '/api/v1/auth/register',
   '/api/v1/auth/refresh',
 ];
 
+// 允许公开 GET 读取的资源
+const PUBLIC_READ_PREFIXES = [
+  '/api/v1/courses',
+  '/api/v1/schedules',
+];
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const { method } = request;
 
   // 跳过非 API 路径
   if (!pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
 
-  // 跳过白名单
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  // Auth 路径完全公开
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
+  // 公开资源：GET 读取不需要认证
+  if (method === 'GET' && PUBLIC_READ_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 

@@ -1,13 +1,9 @@
-import { SignJWT, jwtVerify } from 'jose';
+import { SignJWT } from 'jose';
 import bcrypt from 'bcryptjs';
-import type { UserRole } from '@prisma/client';
+import type { JwtPayload } from './auth-edge';
+import { verifyToken } from './auth-edge';
 
-// ---- 类型 ----
-export interface JwtPayload {
-  userId: string;
-  role: UserRole;
-  tenantId: string;
-}
+export type { JwtPayload };
 
 // ---- 密钥 ----
 const secret = new TextEncoder().encode(
@@ -38,18 +34,8 @@ export async function signRefreshToken(userId: string): Promise<string> {
     .sign(secret);
 }
 
-/**
- * 验证 Token，返回 payload
- * @usedBy src/middleware.ts, 所有需要认证的 Route Handler
- */
-export async function verifyToken(token: string): Promise<JwtPayload | null> {
-  try {
-    const { payload } = await jwtVerify(token, secret);
-    return payload as unknown as JwtPayload;
-  } catch {
-    return null;
-  }
-}
+// verifyToken 从 auth-edge 重新导出
+export { verifyToken };
 
 // ---- 密码 ----
 const SALT_ROUNDS = 10;
