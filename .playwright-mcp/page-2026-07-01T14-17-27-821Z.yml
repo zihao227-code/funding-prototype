@@ -1,0 +1,30 @@
+- generic [ref=e3]:
+  - heading "星光职业培训学校" [level=1] [ref=e4]
+  - paragraph [ref=e5]: 教育培训机构全流程管理平台 —— 本地高保真原型
+  - generic [ref=e6]:
+    - link "学员登录" [ref=e7] [cursor=pointer]:
+      - /url: /login
+    - link "管理后台" [ref=e8] [cursor=pointer]:
+      - /url: /admin
+  - generic [ref=e9]:
+    - paragraph [ref=e10]: "🔑 演示账号（种子数据）:"
+    - table [ref=e11]:
+      - rowgroup [ref=e12]:
+        - row "角色 手机号 密码" [ref=e13]:
+          - columnheader "角色" [ref=e14]
+          - columnheader "手机号" [ref=e15]
+          - columnheader "密码" [ref=e16]
+      - rowgroup [ref=e17]:
+        - row "Editor 校长 13800001001 password123" [ref=e18]:
+          - cell "Editor 校长" [ref=e19]
+          - cell "13800001001" [ref=e20]
+          - cell "password123" [ref=e21]
+        - row "Trainer 讲师 13800001003 password123" [ref=e22]:
+          - cell "Trainer 讲师" [ref=e23]
+          - cell "13800001003" [ref=e24]
+          - cell "password123" [ref=e25]
+        - row "Learner 学员 13800001004 password123" [ref=e26]:
+          - cell "Learner 学员" [ref=e27]
+          - cell "13800001004" [ref=e28]
+          - cell "password123" [ref=e29]
+  - paragraph [ref=e30]: "Phase 1: 核心链路打通 | v0.1.0"

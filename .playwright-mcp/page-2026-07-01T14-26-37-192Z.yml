@@ -1,0 +1,26 @@
+- generic [active] [ref=f2e1]:
+  - alert [ref=f2e18]
+  - generic [ref=f2e65]:
+    - banner [ref=f2e66]:
+      - generic [ref=f2e67]:
+        - link "← 返回课程列表" [ref=f2e68] [cursor=pointer]:
+          - /url: /courses
+        - link "登录购买" [ref=f2e69] [cursor=pointer]:
+          - /url: /login
+    - main [ref=f2e70]:
+      - generic [ref=f2e71]:
+        - generic [ref=f2e72]:
+          - generic [ref=f2e73]: 线下课
+          - generic [ref=f2e74]: 管理
+        - heading "项目管理PMP认证" [level=1] [ref=f2e75]
+        - paragraph [ref=f2e76]: 围绕PMBOK第七版，系统讲解项目管理五大过程组和十大知识领域，助你顺利通过PMP认证考试。
+        - generic [ref=f2e77]: 讲师：张校长
+      - heading "可选班次" [level=2] [ref=f2e78]
+      - generic [ref=f2e80]:
+        - generic [ref=f2e81]:
+          - heading "PMP第3期集训班" [level=4] [ref=f2e82]
+          - paragraph [ref=f2e83]: 2026/8/1 ～ 2026/8/15
+          - paragraph [ref=f2e84]: 301教室 · 已报 1/20 人
+        - generic [ref=f2e85]:
+          - paragraph [ref=f2e86]: ¥2,980.00
+          - button "立即报名" [ref=f2e87] [cursor=pointer]

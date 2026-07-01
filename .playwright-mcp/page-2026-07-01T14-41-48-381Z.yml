@@ -1,0 +1,64 @@
+- generic [ref=f6e1]:
+  - generic [ref=f6e2]:
+    - complementary [ref=f6e3]:
+      - generic [ref=f6e4]:
+        - heading "星光培训" [level=1] [ref=f6e5]
+        - paragraph [ref=f6e6]: 管理后台
+      - navigation [ref=f6e7]:
+        - link "📊 仪表盘" [ref=f6e8] [cursor=pointer]:
+          - /url: /admin
+          - generic [ref=f6e9]: 📊
+          - text: 仪表盘
+        - link "📚 课程管理" [ref=f6e10] [cursor=pointer]:
+          - /url: /admin/courses
+          - generic [ref=f6e11]: 📚
+          - text: 课程管理
+        - link "📅 排期日历" [ref=f6e12] [cursor=pointer]:
+          - /url: /admin/schedules
+          - generic [ref=f6e13]: 📅
+          - text: 排期日历
+        - link "💰 订单管理" [ref=f6e14] [cursor=pointer]:
+          - /url: /admin/orders
+          - generic [ref=f6e15]: 💰
+          - text: 订单管理
+        - link "👥 学员管理" [ref=f6e16] [cursor=pointer]:
+          - /url: /admin/users
+          - generic [ref=f6e17]: 👥
+          - text: 学员管理
+        - link "✅ 考勤管理" [ref=f6e18] [cursor=pointer]:
+          - /url: /admin/attendance
+          - generic [ref=f6e19]: ✅
+          - text: 考勤管理
+      - generic [ref=f6e20]:
+        - paragraph [ref=f6e21]: 李明
+        - button "退出登录" [ref=f6e22] [cursor=pointer]
+    - main [ref=f6e23]:
+      - generic [ref=f6e48]:
+        - generic [ref=f6e49]:
+          - generic [ref=f6e50]:
+            - heading "测试课程" [level=2] [ref=f6e51]
+            - paragraph [ref=f6e52]: "基准价格: ¥100.00 · 状态: draft"
+          - button "← 返回" [ref=f6e53] [cursor=pointer]
+        - generic [ref=f6e54]:
+          - generic [ref=f6e55]:
+            - heading "排期管理" [level=3] [ref=f6e56]
+            - button "+ 添加排期" [active] [ref=f6e57] [cursor=pointer]
+          - generic [ref=f6e67]:
+            - textbox "班次名称（如：第3期周末班）" [ref=f6e68]
+            - generic [ref=f6e69]:
+              - textbox [ref=f6e70]
+              - textbox [ref=f6e71]
+            - generic [ref=f6e72]:
+              - spinbutton "容量" [ref=f6e73]: "20"
+              - button "确认添加" [ref=f6e74] [cursor=pointer]
+          - table [ref=f6e58]:
+            - rowgroup [ref=f6e59]:
+              - row "班次 时间 容量 地点/讲师 状态 操作" [ref=f6e60]:
+                - columnheader "班次" [ref=f6e61]
+                - columnheader "时间" [ref=f6e62]
+                - columnheader "容量" [ref=f6e63]
+                - columnheader "地点/讲师" [ref=f6e64]
+                - columnheader "状态" [ref=f6e65]
+                - columnheader "操作" [ref=f6e66]
+            - rowgroup
+  - alert [ref=f6e46]

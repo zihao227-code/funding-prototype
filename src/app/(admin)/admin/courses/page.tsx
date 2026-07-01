@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { apiClient, formatMoney, STATUS_LABELS } from '@/lib/api-client';
 
 interface Course {
@@ -17,6 +18,8 @@ interface Course {
 export default function AdminCourseList() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const fetchCourses = () => {
     setLoading(true);
@@ -26,13 +29,7 @@ export default function AdminCourseList() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    fetchCourses();
-    // 每次页面获得焦点时自动刷新
-    const onFocus = () => fetchCourses();
-    window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
-  }, []);
+  useEffect(() => { fetchCourses(); }, [pathname]); // 每次导航到本页都刷新
 
   const handlePublish = async (id: string) => {
     await apiClient(`/api/v1/courses/${id}/publish`, { method: 'POST' });

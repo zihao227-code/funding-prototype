@@ -23,6 +23,19 @@ export const createScheduleSchema = z.object({
   trainerId: z.string().optional().nullable(),
 });
 
+export const updateScheduleSchema = z.object({
+  title: z.string().min(1, '班次名称不能为空').max(100).optional(),
+  startTime: z.string().min(1, '开始时间不能为空').optional(),
+  endTime: z.string().min(1, '结束时间不能为空').optional(),
+  capacity: z.number().int().min(1).max(999).optional(),
+  registrationDeadline: z.string().datetime().optional(),
+  price: z.number().int().min(0).optional().nullable(),
+  meetingLink: z.string().url().optional().nullable(),
+  classroomId: z.string().optional().nullable(),
+  trainerId: z.string().optional().nullable(),
+});
+
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 export type CreateScheduleInput = z.infer<typeof createScheduleSchema>;
+export type UpdateScheduleInput = z.infer<typeof updateScheduleSchema>;

@@ -1,0 +1,81 @@
+- generic [ref=f5e1]:
+  - generic [ref=f5e2]:
+    - complementary [ref=f5e3]:
+      - generic [ref=f5e4]:
+        - heading "星光培训" [level=1] [ref=f5e5]
+        - paragraph [ref=f5e6]: 管理后台
+      - navigation [ref=f5e7]:
+        - link "📊 仪表盘" [ref=f5e8] [cursor=pointer]:
+          - /url: /admin
+          - generic [ref=f5e9]: 📊
+          - text: 仪表盘
+        - link "📚 课程管理" [active] [ref=f5e10] [cursor=pointer]:
+          - /url: /admin/courses
+          - generic [ref=f5e11]: 📚
+          - text: 课程管理
+        - link "📅 排期日历" [ref=f5e12] [cursor=pointer]:
+          - /url: /admin/schedules
+          - generic [ref=f5e13]: 📅
+          - text: 排期日历
+        - link "💰 订单管理" [ref=f5e14] [cursor=pointer]:
+          - /url: /admin/orders
+          - generic [ref=f5e15]: 💰
+          - text: 订单管理
+        - link "👥 学员管理" [ref=f5e16] [cursor=pointer]:
+          - /url: /admin/users
+          - generic [ref=f5e17]: 👥
+          - text: 学员管理
+        - link "✅ 考勤管理" [ref=f5e18] [cursor=pointer]:
+          - /url: /admin/attendance
+          - generic [ref=f5e19]: ✅
+          - text: 考勤管理
+      - generic [ref=f5e20]:
+        - paragraph [ref=f5e21]: 李明
+        - button "退出登录" [ref=f5e22] [cursor=pointer]
+    - main [ref=f5e23]:
+      - generic [ref=f5e37]:
+        - generic [ref=f5e38]:
+          - heading "课程管理" [level=2] [ref=f5e39]
+          - link "+ 创建课程" [ref=f5e40] [cursor=pointer]:
+            - /url: /admin/courses/new
+        - table [ref=f5e42]:
+          - rowgroup [ref=f5e43]:
+            - row "课程名称 价格 类型 状态 排期 操作" [ref=f5e44]:
+              - columnheader "课程名称" [ref=f5e45]
+              - columnheader "价格" [ref=f5e46]
+              - columnheader "类型" [ref=f5e47]
+              - columnheader "状态" [ref=f5e48]
+              - columnheader "排期" [ref=f5e49]
+              - columnheader "操作" [ref=f5e50]
+          - rowgroup [ref=f5e51]:
+            - row "项目管理PMP认证 ¥2,980.00 线下 已发布 1 个 编辑 下架" [ref=f5e52]:
+              - cell "项目管理PMP认证" [ref=f5e53]
+              - cell "¥2,980.00" [ref=f5e54]
+              - cell "线下" [ref=f5e55]
+              - cell "已发布" [ref=f5e56]
+              - cell "1 个" [ref=f5e57]
+              - cell "编辑 下架" [ref=f5e58]:
+                - link "编辑" [ref=f5e59] [cursor=pointer]:
+                  - /url: /admin/courses/course-pm
+                - button "下架" [ref=f5e60] [cursor=pointer]
+            - row "UI设计从入门到精通 ¥1,680.00 线下 已发布 1 个 编辑 下架" [ref=f5e61]:
+              - cell "UI设计从入门到精通" [ref=f5e62]
+              - cell "¥1,680.00" [ref=f5e63]
+              - cell "线下" [ref=f5e64]
+              - cell "已发布" [ref=f5e65]
+              - cell "1 个" [ref=f5e66]
+              - cell "编辑 下架" [ref=f5e67]:
+                - link "编辑" [ref=f5e68] [cursor=pointer]:
+                  - /url: /admin/courses/course-ui
+                - button "下架" [ref=f5e69] [cursor=pointer]
+            - row "Python全栈开发实战 ¥1,980.00 线下 已发布 4 个 编辑 下架" [ref=f5e70]:
+              - cell "Python全栈开发实战" [ref=f5e71]
+              - cell "¥1,980.00" [ref=f5e72]
+              - cell "线下" [ref=f5e73]
+              - cell "已发布" [ref=f5e74]
+              - cell "4 个" [ref=f5e75]
+              - cell "编辑 下架" [ref=f5e76]:
+                - link "编辑" [ref=f5e77] [cursor=pointer]:
+                  - /url: /admin/courses/course-python
+                - button "下架" [ref=f5e78] [cursor=pointer]
+  - alert [ref=f5e36]

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import type { CreateScheduleInput } from '@/lib/validators/course';
+import type { CreateScheduleInput, UpdateScheduleInput } from '@/lib/validators/course';
 
 /**
  * 某课程的排期列表
@@ -95,7 +95,7 @@ export async function createSchedule(courseId: string, input: CreateScheduleInpu
  * 更新排期
  * @usedBy PUT /api/v1/schedules/[id]
  */
-export async function updateSchedule(id: string, input: Partial<CreateScheduleInput>) {
+export async function updateSchedule(id: string, input: UpdateScheduleInput) {
   return prisma.schedule.update({
     where: { id },
     data: input,
@@ -104,9 +104,15 @@ export async function updateSchedule(id: string, input: Partial<CreateScheduleIn
 
 /**
  * 取消排期
+ * 只有 open 状态的排期才能取消
  * @usedBy POST /api/v1/schedules/[id]/cancel
  */
 export async function cancelSchedule(id: string, reason?: string) {
+  const schedule = await prisma.schedule.findUnique({ where: { id } });
+  if (!schedule) throw new Error('排期不存在');
+  if (schedule.status !== 'open') {
+    throw new Error(`无法取消状态为 "${schedule.status}" 的排期`);
+  }
   return prisma.schedule.update({
     where: { id },
     data: { status: 'cancelled', cancellationReason: reason || null },

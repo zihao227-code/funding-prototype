@@ -99,9 +99,15 @@ export async function publishCourse(id: string, tenantId: string) {
 
 /**
  * 下架/归档课程
+ * 只有 published 状态的课程才能归档
  * @usedBy POST /api/v1/courses/[id]/archive
  */
 export async function archiveCourse(id: string, tenantId: string) {
+  const course = await prisma.course.findFirst({ where: { id, tenantId } });
+  if (!course) throw new Error('课程不存在');
+  if (course.status !== 'published') {
+    throw new Error(`无法归档状态为 "${course.status}" 的课程`);
+  }
   return prisma.course.update({
     where: { id, tenantId },
     data: { status: 'archived', archivedAt: new Date() },

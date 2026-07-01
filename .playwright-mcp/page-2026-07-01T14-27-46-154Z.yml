@@ -1,0 +1,17 @@
+- generic [active] [ref=f2e1]:
+  - alert [ref=f2e18]
+  - generic [ref=f2e88]:
+    - banner [ref=f2e89]:
+      - generic [ref=f2e90]:
+        - heading "确认订单" [level=1] [ref=f2e91]
+        - link "← 返回选课" [ref=f2e92] [cursor=pointer]:
+          - /url: /courses
+    - main [ref=f2e93]:
+      - generic [ref=f2e94]:
+        - generic [ref=f2e95]:
+          - generic [ref=f2e96]: 项目管理PMP认证
+          - generic [ref=f2e97]: ¥2,980.00
+        - generic [ref=f2e98]:
+          - generic [ref=f2e99]: 合计
+          - generic [ref=f2e100]: ¥2,980.00
+      - button "提交订单" [ref=f2e101] [cursor=pointer]

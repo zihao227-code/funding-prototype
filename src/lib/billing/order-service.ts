@@ -11,6 +11,7 @@ function genOrderNumber(): string {
 
 /**
  * 创建统一订单
+ * 使用 prisma.$transaction 包裹容量检查和订单创建，防止并发超卖
  * @usedBy POST /api/v1/orders
  */
 export async function createOrder(params: {
@@ -22,50 +23,52 @@ export async function createOrder(params: {
 }) {
   const { tenantId, buyerId, operatorId, channel, scheduleIds } = params;
 
-  // 1. 获取排期信息并计算金额
-  let originalAmount = 0;
-  const items: { scheduleId: string; unitPrice: number; discountDetail: string }[] = [];
+  return prisma.$transaction(async (tx) => {
+    // 1. 获取排期信息并计算金额（事务内读取，确保一致性）
+    let originalAmount = 0;
+    const items: { scheduleId: string; unitPrice: number; discountDetail: string }[] = [];
 
-  for (const sid of scheduleIds) {
-    const schedule = await prisma.schedule.findUnique({
-      where: { id: sid },
-      include: { course: { select: { basePrice: true } } },
-    });
-    if (!schedule) throw new Error(`排期 ${sid} 不存在`);
-    if (schedule.status !== 'open') throw new Error(`排期 "${schedule.title}" 已关闭`);
-    if (schedule.enrolledCount >= schedule.capacity) throw new Error(`排期 "${schedule.title}" 已满班`);
+    for (const sid of scheduleIds) {
+      const schedule = await tx.schedule.findUnique({
+        where: { id: sid },
+        include: { course: { select: { basePrice: true } } },
+      });
+      if (!schedule) throw new Error(`排期 ${sid} 不存在`);
+      if (schedule.status !== 'open') throw new Error(`排期 "${schedule.title}" 已关闭`);
+      if (schedule.enrolledCount >= schedule.capacity) throw new Error(`排期 "${schedule.title}" 已满班`);
 
-    const unitPrice = schedule.price ?? schedule.course.basePrice;
-    originalAmount += unitPrice;
-    items.push({
-      scheduleId: sid,
-      unitPrice,
-      discountDetail: JSON.stringify([]), // Phase 1: 无折扣
-    });
-  }
+      const unitPrice = schedule.price ?? schedule.course.basePrice;
+      originalAmount += unitPrice;
+      items.push({
+        scheduleId: sid,
+        unitPrice,
+        discountDetail: JSON.stringify([]), // Phase 1: 无折扣
+      });
+    }
 
-  // 2. 创建订单（15分钟超时）
-  const order = await prisma.order.create({
-    data: {
-      tenantId,
-      orderNumber: genOrderNumber(),
-      buyerId,
-      operatorId,
-      channel,
-      originalAmount,
-      discountAmount: 0,
-      payableAmount: originalAmount,
-      paidAmount: 0,
-      status: 'pending',
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
-      orderItems: {
-        create: items,
+    // 2. 创建订单（15分钟超时）
+    const order = await tx.order.create({
+      data: {
+        tenantId,
+        orderNumber: genOrderNumber(),
+        buyerId,
+        operatorId,
+        channel,
+        originalAmount,
+        discountAmount: 0,
+        payableAmount: originalAmount,
+        paidAmount: 0,
+        status: 'pending',
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        orderItems: {
+          create: items,
+        },
       },
-    },
-    include: { orderItems: true },
-  });
+      include: { orderItems: true },
+    });
 
-  return order;
+    return order;
+  });
 }
 
 /**

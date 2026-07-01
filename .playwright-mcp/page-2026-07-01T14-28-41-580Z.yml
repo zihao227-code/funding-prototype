@@ -1,0 +1,17 @@
+- generic [active] [ref=f2e1]:
+  - alert [ref=f2e18]
+  - generic [ref=f2e103]:
+    - heading "模拟支付" [level=1] [ref=f2e104]
+    - paragraph [ref=f2e105]:
+      - text: "订单: ORD-20260701-LVX3OECF"
+      - text: "金额:"
+      - strong [ref=f2e106]: ¥2,980.00
+    - generic [ref=f2e107]:
+      - generic [ref=f2e108] [cursor=pointer]: 微信支付
+      - generic [ref=f2e110] [cursor=pointer]: 支付宝
+      - generic [ref=f2e112] [cursor=pointer]: 现金
+    - generic [ref=f2e114]:
+      - paragraph [ref=f2e115]: 模拟支付扫码界面
+      - generic [ref=f2e117]: 📱
+    - button "模拟支付成功" [ref=f2e118] [cursor=pointer]
+    - button "取消订单" [ref=f2e119] [cursor=pointer]

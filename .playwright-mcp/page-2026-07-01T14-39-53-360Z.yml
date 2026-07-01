@@ -1,0 +1,61 @@
+- generic [ref=f6e1]:
+  - generic [ref=f6e2]:
+    - complementary [ref=f6e3]:
+      - generic [ref=f6e4]:
+        - heading "星光培训" [level=1] [ref=f6e5]
+        - paragraph [ref=f6e6]: 管理后台
+      - navigation [ref=f6e7]:
+        - link "📊 仪表盘" [ref=f6e8] [cursor=pointer]:
+          - /url: /admin
+          - generic [ref=f6e9]: 📊
+          - text: 仪表盘
+        - link "📚 课程管理" [ref=f6e10] [cursor=pointer]:
+          - /url: /admin/courses
+          - generic [ref=f6e11]: 📚
+          - text: 课程管理
+        - link "📅 排期日历" [ref=f6e12] [cursor=pointer]:
+          - /url: /admin/schedules
+          - generic [ref=f6e13]: 📅
+          - text: 排期日历
+        - link "💰 订单管理" [ref=f6e14] [cursor=pointer]:
+          - /url: /admin/orders
+          - generic [ref=f6e15]: 💰
+          - text: 订单管理
+        - link "👥 学员管理" [ref=f6e16] [cursor=pointer]:
+          - /url: /admin/users
+          - generic [ref=f6e17]: 👥
+          - text: 学员管理
+        - link "✅ 考勤管理" [ref=f6e18] [cursor=pointer]:
+          - /url: /admin/attendance
+          - generic [ref=f6e19]: ✅
+          - text: 考勤管理
+      - generic [ref=f6e20]:
+        - paragraph [ref=f6e21]: 李明
+        - button "退出登录" [ref=f6e22] [cursor=pointer]
+    - main [ref=f6e23]:
+      - generic [ref=f6e24]:
+        - heading "创建课程" [level=2] [ref=f6e25]
+        - generic [ref=f6e26]:
+          - generic [ref=f6e27]:
+            - generic [ref=f6e28]: 课程名称 *
+            - textbox [active] [ref=f6e29]: 测试课程
+          - generic [ref=f6e30]:
+            - generic [ref=f6e31]: 课程描述
+            - textbox [ref=f6e32]
+          - generic [ref=f6e33]:
+            - generic [ref=f6e34]:
+              - generic [ref=f6e35]: 课程类型
+              - combobox [ref=f6e36]:
+                - option "线下"
+                - option "线上" [selected]
+                - option "混合"
+            - generic [ref=f6e37]:
+              - generic [ref=f6e38]: 价格 (元) *
+              - spinbutton [ref=f6e39]: "0"
+            - generic [ref=f6e40]:
+              - generic [ref=f6e41]: 分类
+              - 'textbox "如: IT技术" [ref=f6e42]'
+          - generic [ref=f6e43]:
+            - button "创建课程" [ref=f6e44] [cursor=pointer]
+            - button "取消" [ref=f6e45] [cursor=pointer]
+  - alert [ref=f6e46]

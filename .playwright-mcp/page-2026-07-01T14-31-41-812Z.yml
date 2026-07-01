@@ -1,0 +1,19 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e3]:
+    - heading "登录" [level=1] [ref=f4e4]
+    - generic [ref=f4e5]:
+      - generic [ref=f4e6]:
+        - generic [ref=f4e7]: 机构ID
+        - textbox "tenant-001" [ref=f4e8]
+      - generic [ref=f4e9]:
+        - generic [ref=f4e10]: 手机号
+        - textbox "13800001001" [ref=f4e11]
+      - generic [ref=f4e12]:
+        - generic [ref=f4e13]: 密码
+        - textbox "password123" [ref=f4e14]
+      - button "登录" [ref=f4e15] [cursor=pointer]
+    - paragraph [ref=f4e16]:
+      - text: 还没有账号？
+      - link "注册" [ref=f4e17] [cursor=pointer]:
+        - /url: /register
+  - alert [ref=f4e18]
