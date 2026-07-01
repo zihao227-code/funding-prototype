@@ -24,47 +24,39 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const { method } = request;
 
-  // 跳过非 API 路径
-  if (!pathname.startsWith('/api/')) {
-    return NextResponse.next();
-  }
+  if (!pathname.startsWith('/api/')) return NextResponse.next();
 
-  // Auth 路径完全公开
-  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
-    return NextResponse.next();
-  }
+  const isPublicPath = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
+  const isPublicRead = method === 'GET' && PUBLIC_READ_PREFIXES.some((p) => pathname.startsWith(p));
 
-  // 公开资源：GET 读取不需要认证
-  if (method === 'GET' && PUBLIC_READ_PREFIXES.some((p) => pathname.startsWith(p))) {
-    return NextResponse.next();
-  }
-
-  // 验证 JWT
+  // 尝试解析JWT（无论是否公开路径，有token就注入用户信息）
   const authHeader = request.headers.get('authorization');
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-
-  if (!token) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: '未提供认证Token' } },
-      { status: 401 }
-    );
+  let payload = null;
+  if (token) {
+    payload = await verifyToken(token);
   }
 
-  const payload = await verifyToken(token);
-  if (!payload) {
-    return NextResponse.json(
-      { error: { code: 'UNAUTHORIZED', message: 'Token无效或已过期' } },
-      { status: 401 }
-    );
+  // 非公开路径必须认证
+  if (!isPublicPath && !isPublicRead) {
+    if (!payload) {
+      return NextResponse.json(
+        { error: { code: 'UNAUTHORIZED', message: token ? 'Token无效或已过期' : '未提供认证Token' } },
+        { status: 401 }
+      );
+    }
   }
 
-  // 注入用户信息到请求头（Route Handler 中读取）
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-user-id', payload.userId);
-  requestHeaders.set('x-user-role', payload.role);
-  requestHeaders.set('x-tenant-id', payload.tenantId);
+  // 注入用户信息（如果有）
+  if (payload) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', payload.userId);
+    requestHeaders.set('x-user-role', payload.role);
+    requestHeaders.set('x-tenant-id', payload.tenantId);
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
 
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  return NextResponse.next();
 }
 
 export const config = {
