@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getCourseById, updateCourse, publishCourse, archiveCourse } from '@/lib/cls/course-service';
+import { getCourseById, updateCourse, deleteCourse } from '@/lib/cls/course-service';
 import { updateCourseSchema } from '@/lib/validators/course';
 import { errorResponse, NotFoundError } from '@/lib/errors';
 
@@ -33,6 +33,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
     const course = await updateCourse(params.id, parsed.data, tenantId);
     return Response.json(course);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+/**
+ * DELETE /api/v1/courses/[id] — 删除课程（仅 draft，仅 Editor）
+ */
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const tenantId = request.headers.get('x-tenant-id') || 'tenant-001';
+    await deleteCourse(params.id, tenantId);
+    return Response.json({ success: true });
   } catch (error) {
     return errorResponse(error);
   }

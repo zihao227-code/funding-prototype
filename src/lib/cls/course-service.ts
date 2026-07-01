@@ -98,6 +98,19 @@ export async function publishCourse(id: string, tenantId: string) {
 }
 
 /**
+ * 删除课程（仅 draft 状态可删除）
+ * @usedBy DELETE /api/v1/courses/[id]
+ */
+export async function deleteCourse(id: string, tenantId: string) {
+  const course = await prisma.course.findFirst({ where: { id, tenantId } });
+  if (!course) throw new Error('课程不存在');
+  if (course.status !== 'draft') {
+    throw new Error(`无法删除状态为 "${course.status}" 的课程，只能删除草稿`);
+  }
+  return prisma.course.delete({ where: { id, tenantId } });
+}
+
+/**
  * 下架/归档课程
  * 只有 published 状态的课程才能归档
  * @usedBy POST /api/v1/courses/[id]/archive

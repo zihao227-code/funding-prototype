@@ -42,6 +42,17 @@ export default function AdminCourseList() {
     fetchCourses();
   };
 
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`确认删除课程「${title}」？此操作不可恢复。`)) return;
+    try {
+      await apiClient(`/api/v1/courses/${id}`, { method: 'DELETE' });
+      alert('课程已删除');
+      fetchCourses();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '删除失败');
+    }
+  };
+
   if (loading) return <p className="text-gray-500">加载中...</p>;
 
   return (
@@ -87,7 +98,10 @@ export default function AdminCourseList() {
                     <button onClick={() => handlePublish(c.id)} className="text-green-600 hover:underline text-sm mr-3">发布</button>
                   )}
                   {c.status === 'published' && (
-                    <button onClick={() => handleArchive(c.id)} className="text-red-500 hover:underline text-sm">下架</button>
+                    <button onClick={() => handleArchive(c.id)} className="text-red-500 hover:underline text-sm mr-3">下架</button>
+                  )}
+                  {c.status === 'draft' && (
+                    <button onClick={() => handleDelete(c.id, c.title)} className="text-red-400 hover:underline text-sm">删除</button>
                   )}
                 </td>
               </tr>
