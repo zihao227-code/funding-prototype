@@ -23,7 +23,8 @@ export default function CreateCoursePage() {
         method: 'POST',
         body: JSON.stringify({ ...form, basePrice: form.basePrice * 100 }),
       });
-      router.push(`/admin/courses/${course.id}`);
+      alert('课程创建成功！');
+      router.push('/admin/courses');
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : '创建失败');
     } finally {

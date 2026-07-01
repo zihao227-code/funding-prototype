@@ -73,6 +73,9 @@ export default function AdminCourseEdit() {
             基准价格: {formatMoney(course.basePrice)} · 状态: {course.status}
           </p>
         </div>
+        <button onClick={() => window.history.back()} className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm">
+          ← 返回
+        </button>
       </div>
 
       {/* 排期管理 */}
