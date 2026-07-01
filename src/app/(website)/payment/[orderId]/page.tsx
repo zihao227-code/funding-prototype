@@ -9,6 +9,7 @@ export default function MockPaymentPage() {
   const router = useRouter();
   const [order, setOrder] = useState<{ payableAmount: number; orderNumber: string; status: string } | null>(null);
   const [paying, setPaying] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [method, setMethod] = useState('wechat');
 
   useEffect(() => {
@@ -28,6 +29,18 @@ export default function MockPaymentPage() {
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : '支付失败');
     } finally { setPaying(false); }
+  }
+
+  async function handleCancel() {
+    if (!confirm('确认取消该订单？取消后无法恢复。')) return;
+    setCancelling(true);
+    try {
+      await apiClient(`/api/v1/orders/${orderId}/cancel`, { method: 'POST' });
+      alert('订单已取消');
+      router.push('/courses');
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '取消订单失败');
+    } finally { setCancelling(false); }
   }
 
   if (!order) return <div className="min-h-screen flex items-center justify-center text-gray-500">加载中...</div>;
