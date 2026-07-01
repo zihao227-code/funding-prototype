@@ -1,8 +1,8 @@
 // =============================================================================
 // 教育培训机构全流程管理平台 — Prisma Schema
-// 版本: v1.0 (Phase 1)
-// 数据库: SQLite (通过 Prisma 操作)
-// 命名规范: 表名 snake_case, 字段名 camelCase, 枚举值 snake_case
+// 版本: v1.0
+// 数据库: SQLite
+// 注意: SQLite不支持enum，所有状态字段使用String类型
 // =============================================================================
 
 generator client {
@@ -15,252 +15,70 @@ datasource db {
 }
 
 // =============================================================================
-// Enums
+// Phase 1 Tables
 // =============================================================================
 
-enum UserRole {
-  editor
-  desk
-  trainer
-  learner
-}
-
-enum UserStatus {
-  active
-  disabled
-}
-
-enum TenantStatus {
-  active
-  suspended
-  expired
-}
-
-enum SubscriptionPlan {
-  starter
-  professional
-  enterprise
-}
-
-enum CourseType {
-  online
-  offline
-  hybrid
-}
-
-enum CourseStatus {
-  draft
-  published
-  archived
-}
-
-enum ScheduleStatus {
-  draft
-  open
-  full
-  cancelled
-  completed
-}
-
-enum EnrollmentStatus {
-  active
-  transferred
-  refunded
-  dropped
-}
-
-enum OrderStatus {
-  pending
-  paid
-  partial_refunded
-  refunded
-  cancelled
-  expired
-}
-
-enum Channel {
-  online
-  desk
-  b2b
-}
-
-enum PaymentMethod {
-  wechat
-  alipay
-  cash
-  transfer
-}
-
-enum PaymentStatus {
-  pending
-  success
-  failed
-}
-
-enum RefundType {
-  full
-  partial
-}
-
-enum RefundStatus {
-  pending
-  approved
-  processed
-  rejected
-}
-
-enum AttendanceStatus {
-  present
-  absent
-  late
-  early_leave
-  excused
-}
-
-enum CheckInMethod {
-  scan
-  qrcode
-  manual
-  gps
-}
-
-enum FundingSource {
-  government
-  enterprise
-  scholarship
-  nonprofit
-}
-
-enum CalculationRule {
-  fixed_per_head
-  percentage
-  conditional
-}
-
-enum FundingApplicationStatus {
-  pending
-  approved
-  rejected
-  disbursed
-}
-
-enum CertificateStatus {
-  issued
-  revoked
-}
-
-enum AssessmentType {
-  exam
-  assignment
-  quiz
-}
-
-enum AssessmentStatus {
-  draft
-  open
-  closed
-}
-
-enum GradeResult {
-  pass
-  fail
-}
-
-enum NotificationChannel {
-  in_app
-  email
-  sms
-}
-
-enum NotificationSendStatus {
-  pending
-  sent
-  failed
-}
-
-enum DiscountType {
-  coupon
-  group_buy
-  early_bird
-  flash_sale
-}
-
-enum DiscountRuleStatus {
-  active
-  paused
-  expired
-}
-
-enum MockMessageStatus {
-  sent
-  failed
-}
-
-// =============================================================================
-// Phase 1 Tables (Core)
-// =============================================================================
-
-// ---------- Tenant ----------
 model Tenant {
-  id                    String             @id @default(cuid())
+  id                    String   @id @default(cuid())
   name                  String
   logo                  String?
   contactPhone          String?
   contactEmail          String?
   address               String?
-  status                TenantStatus       @default(active)
-  subscriptionPlan      SubscriptionPlan   @default(starter)
+  status                String   @default("active")   // active | suspended | expired
+  subscriptionPlan      String   @default("starter")  // starter | professional | enterprise
   subscriptionExpiresAt DateTime?
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  users             User[]
-  courses           Course[]
-  orders            Order[]
-  fundingTypes      FundingType[]
-  certificates      Certificate[]
-  notifications     Notification[]
-  discountRules     DiscountRule[]
-  classrooms        Classroom[]
+  users          User[]
+  courses        Course[]
+  orders         Order[]
+  fundingTypes   FundingType[]
+  certificates   Certificate[]
+  notifications  Notification[]
+  discountRules  DiscountRule[]
+  classrooms     Classroom[]
 
   @@map("tenant")
 }
 
-// ---------- User ----------
 model User {
-  id           String     @id @default(cuid())
+  id           String   @id @default(cuid())
   tenantId     String
-  role         UserRole
+  role         String   // editor | desk | trainer | learner
   phone        String?
   email        String?
   passwordHash String
   displayName  String
   avatar       String?
-  parentId     String?    // 学员-家长绑定，指向父账号
-  status       UserStatus @default(active)
-  registeredAt DateTime   @default(now())
+  parentId     String?
+  status       String   @default("active")  // active | disabled
+  registeredAt DateTime @default(now())
   lastLoginAt  DateTime?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   tenant   Tenant @relation(fields: [tenantId], references: [id])
   parent   User?  @relation("UserBinding", fields: [parentId], references: [id])
   children User[] @relation("UserBinding")
 
-  // 角色关联
-  ordersAsBuyer      Order[]              @relation("OrderBuyer")
-  ordersAsOperator   Order[]              @relation("OrderOperator")
-  enrollments        Enrollment[]
-  attendanceRecords  Attendance[]         @relation("AttendanceUser")
-  attendanceMarked   Attendance[]         @relation("AttendanceMarker")
-  fundingApplications FundingApplication[]
-  certificates       Certificate[]
-  assessmentsCreated Assessment[]
-  gradesReceived     Grade[]              @relation("GradeLearner")
-  gradesGiven        Grade[]              @relation("GradeGrader")
-  notifications      Notification[]
-  coursesCreated     Course[]
-  schedulesAsTrainer Schedule[]
+  ordersAsBuyer        Order[]              @relation("OrderBuyer")
+  ordersAsOperator     Order[]              @relation("OrderOperator")
+  enrollments          Enrollment[]
+  attendanceRecords    Attendance[]         @relation("AttendanceUser")
+  attendanceMarked     Attendance[]         @relation("AttendanceMarker")
+  certificates         Certificate[]        @relation("CertificateUser")
+  revokedCertificates  Certificate[]        @relation("CertificateRevoker")
+  fundingApplications  FundingApplication[] @relation("FundingAppUser")
+  reviewedApplications FundingApplication[] @relation("FundingAppReviewer")
+  notifications        Notification[]
+  coursesCreated       Course[]
+  schedulesAsTrainer   Schedule[]
+  assessmentsCreated   Assessment[]
+  gradesReceived       Grade[]              @relation("GradeLearner")
+  gradesGiven          Grade[]              @relation("GradeGrader")
+  refundsApproved      Refund[]             @relation("RefundApprover")
 
   @@unique([tenantId, phone])
   @@unique([tenantId, email])
@@ -268,75 +86,72 @@ model User {
   @@map("user")
 }
 
-// ---------- Course ----------
 model Course {
-  id            String       @id @default(cuid())
+  id            String    @id @default(cuid())
   tenantId      String
   title         String
   description   String?
   coverImageUrl String?
   category      String?
-  type          CourseType   @default(offline)
-  basePrice     Int          @default(0) // 单位: 分 (1元 = 100)
-  status        CourseStatus @default(draft)
+  type          String    @default("offline")  // online | offline | hybrid
+  basePrice     Int       @default(0)
+  status        String    @default("draft")    // draft | published | archived
   publishedAt   DateTime?
   archivedAt    DateTime?
   createdBy     String
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  tenant        Tenant           @relation(fields: [tenantId], references: [id])
-  creator       User             @relation(fields: [createdBy], references: [id])
-  schedules     Schedule[]
-  courseFundings CourseFunding[]
-  certificates  Certificate[]
+  tenant          Tenant           @relation(fields: [tenantId], references: [id])
+  creator         User             @relation(fields: [createdBy], references: [id])
+  schedules       Schedule[]
+  courseFundings  CourseFunding[]
+  certificates    Certificate[]
 
   @@index([tenantId, status])
   @@index([tenantId, category])
   @@map("course")
 }
 
-// ---------- Schedule ----------
 model Schedule {
-  id                   String         @id @default(cuid())
+  id                   String    @id @default(cuid())
   courseId             String
   classroomId          String?
   trainerId            String?
   title                String
   startTime            DateTime
   endTime              DateTime
-  capacity             Int            @default(20)
-  enrolledCount        Int            @default(0)
+  capacity             Int       @default(20)
+  enrolledCount        Int       @default(0)
   registrationDeadline DateTime?
-  price                Int?           // 班次价格(分)，可覆盖课程价格；null表示使用课程基准价
-  meetingLink          String?        // 线上课链接
-  status               ScheduleStatus @default(draft)
+  price                Int?
+  meetingLink          String?
+  status               String    @default("draft")  // draft | open | full | cancelled | completed
   cancellationReason   String?
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  course      Course        @relation(fields: [courseId], references: [id])
-  classroom   Classroom?    @relation(fields: [classroomId], references: [id])
-  trainer     User?         @relation(fields: [trainerId], references: [id])
-  enrollments Enrollment[]
-  attendances Attendance[]
-  orderItems  OrderItem[]
-  assessments Assessment[]
+  course       Course        @relation(fields: [courseId], references: [id])
+  classroom    Classroom?    @relation(fields: [classroomId], references: [id])
+  trainer      User?         @relation(fields: [trainerId], references: [id])
+  enrollments  Enrollment[]
+  attendances  Attendance[]
+  orderItems   OrderItem[]
+  assessments  Assessment[]
+  certificates Certificate[]
 
   @@index([courseId, status])
   @@index([startTime])
-  @@index([status])
   @@map("schedule")
 }
 
-// ---------- Classroom ----------
 model Classroom {
   id        String   @id @default(cuid())
   tenantId  String
   name      String
   capacity  Int      @default(30)
   location  String?
-  status    String   @default("active") // active / inactive
+  status    String   @default("active")  // active | inactive
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -347,15 +162,14 @@ model Classroom {
   @@map("classroom")
 }
 
-// ---------- Enrollment ----------
 model Enrollment {
-  id         String           @id @default(cuid())
+  id         String   @id @default(cuid())
   scheduleId String
   userId     String
   orderId    String
-  status     EnrollmentStatus @default(active)
-  enrolledAt DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  status     String   @default("active")  // active | transferred | refunded | dropped
+  enrolledAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   schedule Schedule @relation(fields: [scheduleId], references: [id])
   user     User     @relation(fields: [userId], references: [id])
@@ -367,47 +181,45 @@ model Enrollment {
   @@map("enrollment")
 }
 
-// ---------- Order ----------
 model Order {
-  id              String      @id @default(cuid())
-  tenantId        String
-  orderNumber     String      @unique
-  buyerId         String      // 学员 Learner
-  operatorId      String      // 操作者：线上自助=学员本人，线下代购=Desk
-  channel         Channel     @default(online)
-  originalAmount  Int         @default(0) // 折前总额(分)
-  discountAmount  Int         @default(0) // 折扣总额(分)
-  payableAmount   Int         @default(0) // 应付金额(分)
-  paidAmount      Int         @default(0) // 已付金额(分)
-  status          OrderStatus @default(pending)
-  expiresAt       DateTime?              // 超时自动取消时间
-  paidAt          DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id             String    @id @default(cuid())
+  tenantId       String
+  orderNumber    String    @unique
+  buyerId        String
+  operatorId     String
+  channel        String    @default("online")  // online | desk | b2b
+  originalAmount Int       @default(0)
+  discountAmount Int       @default(0)
+  payableAmount  Int       @default(0)
+  paidAmount     Int       @default(0)
+  status         String    @default("pending") // pending | paid | partial_refunded | refunded | cancelled | expired
+  expiresAt      DateTime?
+  paidAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  tenant             Tenant               @relation(fields: [tenantId], references: [id])
-  buyer              User                 @relation("OrderBuyer", fields: [buyerId], references: [id])
-  operator           User                 @relation("OrderOperator", fields: [operatorId], references: [id])
-  orderItems         OrderItem[]
-  payments           Payment[]
-  refunds            Refund[]
-  enrollments        Enrollment[]
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  buyer               User                 @relation("OrderBuyer", fields: [buyerId], references: [id])
+  operator            User                 @relation("OrderOperator", fields: [operatorId], references: [id])
+  orderItems          OrderItem[]
+  payments            Payment[]
+  refunds             Refund[]
+  enrollments         Enrollment[]
   fundingApplications FundingApplication[]
 
   @@index([tenantId, status])
-  @@index([buyerId, status])
+  @@index([buyerId])
   @@index([orderNumber])
   @@map("order")
 }
 
-// ---------- OrderItem ----------
 model OrderItem {
   id             String   @id @default(cuid())
   orderId        String
   scheduleId     String
-  unitPrice      Int      @default(0) // 单价(分)
+  unitPrice      Int      @default(0)
   quantity       Int      @default(1)
-  discountDetail String?              // JSON: 折扣明细 [{type, sourceId, amount, label}]
+  discountDetail String?  // JSON
   createdAt      DateTime @default(now())
 
   order    Order    @relation(fields: [orderId], references: [id])
@@ -418,18 +230,17 @@ model OrderItem {
   @@map("order_item")
 }
 
-// ---------- Payment ----------
 model Payment {
-  id              String        @id @default(cuid())
-  orderId         String
-  paymentMethod   PaymentMethod
-  transactionId   String        @unique
-  amount          Int           @default(0) // 金额(分)
-  currency        String        @default("CNY")
-  status          PaymentStatus @default(pending)
-  callbackRaw     String?                  // 第三方回调原始数据(JSON)
-  paidAt          DateTime?
-  createdAt       DateTime      @default(now())
+  id            String    @id @default(cuid())
+  orderId       String
+  paymentMethod String    // wechat | alipay | cash | transfer
+  transactionId String    @unique
+  amount        Int       @default(0)
+  currency      String    @default("CNY")
+  status        String    @default("pending")  // pending | success | failed
+  callbackRaw   String?
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
 
   order Order @relation(fields: [orderId], references: [id])
 
@@ -437,17 +248,16 @@ model Payment {
   @@map("payment")
 }
 
-// ---------- Attendance ----------
 model Attendance {
-  id            String           @id @default(cuid())
+  id            String    @id @default(cuid())
   scheduleId    String
   userId        String
-  status        AttendanceStatus @default(present)
-  checkInMethod CheckInMethod    @default(manual)
+  status        String    @default("present")  // present | absent | late | early_leave | excused
+  checkInMethod String    @default("manual")   // scan | qrcode | manual | gps
   checkInTime   DateTime?
   checkOutTime  DateTime?
-  markedBy      String?          // Trainer 或 Desk
-  createdAt     DateTime         @default(now())
+  markedBy      String?
+  createdAt     DateTime  @default(now())
 
   schedule Schedule @relation(fields: [scheduleId], references: [id])
   user     User     @relation("AttendanceUser", fields: [userId], references: [id])
@@ -459,25 +269,24 @@ model Attendance {
 }
 
 // =============================================================================
-// Phase 2 Tables (Schema built in Phase 1, logic in Phase 2)
+// Phase 2 Tables
 // =============================================================================
 
-// ---------- FundingType ----------
 model FundingType {
-  id              String         @id @default(cuid())
+  id              String    @id @default(cuid())
   tenantId        String
   name            String
-  source          FundingSource
-  calculationRule CalculationRule
-  amountOrRate    Int            @default(0) // 定额(分)或比例(百分数，如30表示30%)
-  maxAmount       Int?                      // 上限金额(分)
-  budgetLimit     Int            @default(0) // 资金池上限(分)
-  budgetUsed      Int            @default(0) // 已使用金额(分)
+  source          String    // government | enterprise | scholarship | nonprofit
+  calculationRule String    // fixed_per_head | percentage | conditional
+  amountOrRate    Int       @default(0)
+  maxAmount       Int?
+  budgetLimit     Int       @default(0)
+  budgetUsed      Int       @default(0)
   effectiveFrom   DateTime
   effectiveTo     DateTime
-  status          String         @default("active") // active / expired / depleted
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  status          String    @default("active")  // active | expired | depleted
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   tenant              Tenant               @relation(fields: [tenantId], references: [id])
   courseFundings      CourseFunding[]
@@ -487,12 +296,11 @@ model FundingType {
   @@map("funding_type")
 }
 
-// ---------- CourseFunding ----------
 model CourseFunding {
   id            String   @id @default(cuid())
   courseId      String
   fundingTypeId String
-  applicable    Boolean  @default(true) // 该课程是否可使用此资助
+  applicable    Boolean  @default(true)
   createdAt     DateTime @default(now())
 
   course      Course      @relation(fields: [courseId], references: [id])
@@ -502,77 +310,74 @@ model CourseFunding {
   @@map("course_funding")
 }
 
-// ---------- FundingApplication ----------
 model FundingApplication {
-  id              String                  @id @default(cuid())
-  fundingTypeId   String
-  userId          String
-  orderId         String
-  amountApplied   Int                     @default(0) // 申请金额(分)
-  amountApproved  Int?                               // 批准金额(分)
-  status          FundingApplicationStatus @default(pending)
-  reviewedBy      String?
-  reviewedAt      DateTime?
-  reviewComment   String?
-  createdAt       DateTime                @default(now())
-  updatedAt       DateTime                @updatedAt
+  id             String    @id @default(cuid())
+  fundingTypeId  String
+  userId         String
+  orderId        String
+  amountApplied  Int       @default(0)
+  amountApproved Int?
+  status         String    @default("pending")  // pending | approved | rejected | disbursed
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  reviewComment  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   fundingType FundingType @relation(fields: [fundingTypeId], references: [id])
-  user        User        @relation(fields: [userId], references: [id])
+  user        User        @relation("FundingAppUser", fields: [userId], references: [id])
   order       Order       @relation(fields: [orderId], references: [id])
-  reviewer    User?       @relation(fields: [reviewedBy], references: [id])
+  reviewer    User?       @relation("FundingAppReviewer", fields: [reviewedBy], references: [id])
 
   @@index([userId, status])
   @@index([fundingTypeId, status])
   @@map("funding_application")
 }
 
-// ---------- Refund ----------
 model Refund {
-  id           String       @id @default(cuid())
+  id           String    @id @default(cuid())
   orderId      String
-  refundAmount Int          @default(0) // 退款金额(分)
-  refundType   RefundType   @default(full)
+  refundAmount Int       @default(0)
+  refundType   String    @default("full")      // full | partial
   reason       String?
-  status       RefundStatus @default(pending)
+  status       String    @default("pending")   // pending | approved | processed | rejected
   approvedBy   String?
   refundedAt   DateTime?
-  createdAt    DateTime     @default(now())
+  createdAt    DateTime  @default(now())
 
   order    Order @relation(fields: [orderId], references: [id])
-  approver User? @relation(fields: [approvedBy], references: [id])
+  approver User? @relation("RefundApprover", fields: [approvedBy], references: [id])
 
   @@index([orderId])
   @@map("refund")
 }
 
 // =============================================================================
-// Phase 3 Tables (Schema built in Phase 1, logic in Phase 3)
+// Phase 3 Tables
 // =============================================================================
 
-// ---------- Certificate ----------
 model Certificate {
-  id                String            @id @default(cuid())
+  id                String    @id @default(cuid())
   tenantId          String
-  certificateNumber String            @unique
+  certificateNumber String    @unique
   userId            String
   courseId          String
   scheduleId        String
   issueDate         DateTime
   expiryDate        DateTime?
   templateId        String?
-  metadataJson      String?           // 证书内容变量(JSON)
-  status            CertificateStatus @default(issued)
+  metadataJson      String?
+  status            String    @default("issued")  // issued | revoked
   revokedAt         DateTime?
   revokedBy         String?
   revokeReason      String?
-  createdAt         DateTime          @default(now())
+  createdAt         DateTime  @default(now())
 
   tenant   Tenant   @relation(fields: [tenantId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+  user     User     @relation("CertificateUser", fields: [userId], references: [id])
   course   Course   @relation(fields: [courseId], references: [id])
   schedule Schedule @relation(fields: [scheduleId], references: [id])
-  revoker  User?    @relation(fields: [revokedBy], references: [id])
+  revoker  User?    @relation("CertificateRevoker", fields: [revokedBy], references: [id])
 
   @@index([tenantId])
   @@index([userId])
@@ -580,19 +385,18 @@ model Certificate {
   @@map("certificate")
 }
 
-// ---------- Assessment ----------
 model Assessment {
-  id         String           @id @default(cuid())
-  scheduleId String
-  createdBy  String
-  title      String
+  id          String    @id @default(cuid())
+  scheduleId  String
+  createdBy   String
+  title       String
   description String?
-  type       AssessmentType   @default(exam)
-  totalScore Int              @default(100)
-  passScore  Int              @default(60)
-  dueDate    DateTime?
-  status     AssessmentStatus @default(draft)
-  createdAt  DateTime         @default(now())
+  type        String    @default("exam")    // exam | assignment | quiz
+  totalScore  Int       @default(100)
+  passScore   Int       @default(60)
+  dueDate     DateTime?
+  status      String    @default("draft")   // draft | open | closed
+  createdAt   DateTime  @default(now())
 
   schedule Schedule @relation(fields: [scheduleId], references: [id])
   creator  User     @relation(fields: [createdBy], references: [id])
@@ -602,17 +406,16 @@ model Assessment {
   @@map("assessment")
 }
 
-// ---------- Grade ----------
 model Grade {
-  id           String      @id @default(cuid())
+  id           String    @id @default(cuid())
   assessmentId String
   userId       String
-  score        Int         @default(0)
-  result       GradeResult @default(fail)
+  score        Int       @default(0)
+  result       String    @default("fail")   // pass | fail
   feedback     String?
   gradedBy     String
-  gradedAt     DateTime    @default(now())
-  createdAt    DateTime    @default(now())
+  gradedAt     DateTime  @default(now())
+  createdAt    DateTime  @default(now())
 
   assessment Assessment @relation(fields: [assessmentId], references: [id])
   learner    User       @relation("GradeLearner", fields: [userId], references: [id])
@@ -622,19 +425,18 @@ model Grade {
   @@map("grade")
 }
 
-// ---------- Notification ----------
 model Notification {
-  id         String                 @id @default(cuid())
+  id         String    @id @default(cuid())
   tenantId   String
   userId     String
-  eventType  String                 // 事件类型: purchase_success, course_reminder, refund_notice, etc.
+  eventType  String
   title      String
   content    String
-  isRead     Boolean                @default(false)
+  isRead     Boolean   @default(false)
   readAt     DateTime?
-  channel    NotificationChannel    @default(in_app)
-  sendStatus NotificationSendStatus @default(sent)
-  createdAt  DateTime               @default(now())
+  channel    String    @default("in_app")   // in_app | email | sms
+  sendStatus String    @default("sent")     // pending | sent | failed
+  createdAt  DateTime  @default(now())
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
@@ -644,44 +446,41 @@ model Notification {
   @@map("notification")
 }
 
-// ---------- MockSms ----------
 model MockSms {
-  id           String            @id @default(cuid())
+  id           String   @id @default(cuid())
   phone        String
   content      String
   templateCode String?
-  status       MockMessageStatus @default(sent)
-  createdAt    DateTime          @default(now())
+  status       String   @default("sent")    // sent | failed
+  createdAt    DateTime @default(now())
 
   @@map("mock_sms")
 }
 
-// ---------- MockEmail ----------
 model MockEmail {
-  id        String            @id @default(cuid())
+  id        String   @id @default(cuid())
   toEmail   String
   subject   String
   bodyHtml  String
-  status    MockMessageStatus @default(sent)
-  createdAt DateTime          @default(now())
+  status    String   @default("sent")       // sent | failed
+  createdAt DateTime @default(now())
 
   @@map("mock_email")
 }
 
-// ---------- DiscountRule ----------
 model DiscountRule {
-  id            String            @id @default(cuid())
+  id            String    @id @default(cuid())
   tenantId      String
-  type          DiscountType
-  code          String?           // 优惠券码(coupon类型必填)，全局唯一
-  ruleConfig    String            // JSON: 折扣规则配置
-  usageLimit    Int               @default(0) // 0=不限制
-  usageCount    Int               @default(0)
+  type          String    // coupon | group_buy | early_bird | flash_sale
+  code          String?
+  ruleConfig    String    // JSON
+  usageLimit    Int       @default(0)
+  usageCount    Int       @default(0)
   effectiveFrom DateTime
   effectiveTo   DateTime
-  status        DiscountRuleStatus @default(active)
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  status        String    @default("active")  // active | paused | expired
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
